@@ -1,23 +1,43 @@
-import { useState } from "react";
-import type { Language, SubmissionResult, SelectedMethod } from "../types/verification";
+import { use, useState, useEffect } from "react";
+import type {
+  Language,
+  SubmissionResult,
+  SelectedMethod,
+} from "../types/verification";
+import { useUserSession } from "~/contexts/UserSessionContext";
 
 export function useVerificationState() {
+  const { session } = useUserSession();
+  const tenantNetworks = session?.tenantNetworks ?? [];
+  const hasTenant = session ? tenantNetworks.length > 0 : false;
+  const [privateVerification, setPrivateVerification] =
+    useState<boolean>(hasTenant);
+  useEffect(() => setPrivateVerification(hasTenant), [hasTenant]);
   const [selectedChainId, setSelectedChainId] = useState<string>("");
   const [contractAddress, setContractAddress] = useState<string>("");
-  const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null);
+  const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(
+    null
+  );
   const [selectedMethod, setSelectedMethod] = useState<SelectedMethod | "">("");
-  const [selectedCompilerVersion, setSelectedCompilerVersion] = useState<string>("");
+  const [selectedCompilerVersion, setSelectedCompilerVersion] =
+    useState<string>("");
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [metadataFile, setMetadataFile] = useState<File | null>(null);
   const [evmVersion, setEvmVersion] = useState<string>("");
   const [optimizerEnabled, setOptimizerEnabled] = useState<boolean>(false);
   const [optimizerRuns, setOptimizerRuns] = useState<number>(200);
   const [contractIdentifier, setContractIdentifier] = useState<string>("");
-  const [creationTransactionHash, setCreationTransactionHash] = useState<string>("");
+  const [creationTransactionHash, setCreationTransactionHash] =
+    useState<string>("");
 
   // Submission state
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submissionResult, setSubmissionResult] = useState<SubmissionResult | null>(null);
+  const [submissionResult, setSubmissionResult] =
+    useState<SubmissionResult | null>(null);
+
+  const handlePrivateVerificationChange = (value: boolean) => {
+    setPrivateVerification(value);
+  };
 
   const handleChainIdChange = (value: string) => {
     setSelectedChainId(value);
@@ -83,6 +103,8 @@ export function useVerificationState() {
   };
 
   return {
+    hasTenant,
+    privateVerification,
     selectedChainId,
     contractAddress,
     selectedLanguage,
@@ -95,6 +117,7 @@ export function useVerificationState() {
     optimizerRuns,
     contractIdentifier,
     creationTransactionHash,
+    handlePrivateVerificationChange,
     handleChainIdChange,
     handleContractAddressChange,
     handleLanguageSelect,

@@ -12,6 +12,7 @@ function sourcifyFetch(
 
   return fetch(url, {
     ...options,
+    credentials: "include",
     headers: {
       ...options.headers,
       "X-Client-Source": "sourcify-ui",
@@ -55,6 +56,7 @@ interface VerificationPayload {
   compilerVersion: string;
   contractIdentifier: string;
   creationTransactionHash?: string;
+  privateVerification?: boolean;
 }
 
 interface VerificationResponse {
@@ -114,13 +116,15 @@ async function submitStandardJsonVerification(
   stdJsonInput: StandardJsonInput,
   compilerVersion: string,
   contractIdentifier: string,
-  creationTransactionHash?: string
+  creationTransactionHash?: string,
+  privateVerification = false
 ): Promise<VerificationResponse> {
   const payload: VerificationPayload = {
     stdJsonInput,
     compilerVersion,
     contractIdentifier,
     ...(creationTransactionHash && { creationTransactionHash }),
+    privateVerification,
   };
 
   const response = await sourcifyFetch(
@@ -151,7 +155,8 @@ export async function assembleAndSubmitStandardJson(
   compilerVersion: string,
   contractIdentifier: string,
   settings: CompilerSettings,
-  creationTransactionHash?: string
+  creationTransactionHash?: string,
+  privateVerification = false
 ): Promise<VerificationResponse> {
   const stdJsonInput = await buildStandardJsonInput(files, language, settings);
 
@@ -162,7 +167,8 @@ export async function assembleAndSubmitStandardJson(
     stdJsonInput,
     compilerVersion,
     contractIdentifier,
-    creationTransactionHash
+    creationTransactionHash,
+    privateVerification
   );
 }
 
@@ -173,7 +179,8 @@ export async function submitStdJsonFile(
   stdJsonFile: File,
   compilerVersion: string,
   contractIdentifier: string,
-  creationTransactionHash?: string
+  creationTransactionHash?: string,
+  privateVerification = false
 ): Promise<VerificationResponse> {
   const stdJsonContent = await stdJsonFile.text();
   let stdJsonInput: StandardJsonInput;
@@ -191,7 +198,8 @@ export async function submitStdJsonFile(
     stdJsonInput,
     compilerVersion,
     contractIdentifier,
-    creationTransactionHash
+    creationTransactionHash,
+    privateVerification
   );
 }
 
@@ -199,6 +207,7 @@ interface MetadataVerificationPayload {
   sources: Record<string, string>;
   metadata: any;
   creationTransactionHash?: string;
+  privateVerification: boolean;
 }
 
 export async function submitMetadataVerification(
@@ -207,12 +216,14 @@ export async function submitMetadataVerification(
   address: string,
   sources: Record<string, string>,
   metadata: any,
-  creationTransactionHash?: string
+  creationTransactionHash?: string,
+  privateVerification = false
 ): Promise<VerificationResponse> {
   const payload: MetadataVerificationPayload = {
     sources,
     metadata,
     ...(creationTransactionHash && { creationTransactionHash }),
+    privateVerification,
   };
 
   const response = await sourcifyFetch(

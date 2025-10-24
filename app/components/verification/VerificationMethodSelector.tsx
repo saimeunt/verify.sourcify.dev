@@ -1,7 +1,11 @@
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import { useState, useEffect } from "react";
 import { MdInfo } from "react-icons/md";
-import { verificationMethods, frameworkMethods, frameworkMessages } from "../../data/verificationMethods";
+import {
+  verificationMethods,
+  frameworkMethods,
+  frameworkMessages,
+} from "../../data/verificationMethods";
 import type { Language, SelectedMethod } from "../../types/verification";
 import VerificationWarning from "./VerificationWarning";
 
@@ -17,42 +21,55 @@ export default function VerificationMethodSelector({
   onMethodSelect,
 }: VerificationMethodSelectorProps) {
   // Keep track of the last selected framework method so we can return to it
-  const [lastFrameworkMethod, setLastFrameworkMethod] = useState<"hardhat" | "foundry">("hardhat");
-  
+  const [lastFrameworkMethod, setLastFrameworkMethod] = useState<
+    "hardhat" | "foundry"
+  >("hardhat");
+
   if (!selectedLanguage) return null;
 
-  const methods = verificationMethods[selectedLanguage as keyof typeof verificationMethods];
-  
+  const methods =
+    verificationMethods[selectedLanguage as keyof typeof verificationMethods];
+
   // Update lastFrameworkMethod when a framework method is selected
   useEffect(() => {
-    if (frameworkMethods.some(method => method.id === selectedMethod)) {
+    if (frameworkMethods.some((method) => method.id === selectedMethod)) {
       setLastFrameworkMethod(selectedMethod as "hardhat" | "foundry");
     }
   }, [selectedMethod]);
 
   // Check if selected method is a framework method
-  const isFrameworkMethod = frameworkMethods.some((method) => method.id === selectedMethod);
-  
+  const isFrameworkMethod = frameworkMethods.some(
+    (method) => method.id === selectedMethod
+  );
+
   // Check if we're in build-info mode (selected method is build-info)
   const isBuildInfoMode = selectedMethod === "build-info";
 
   // Get the warning for the selected method
   const selectedMethodWarning =
     selectedMethod && selectedLanguage
-      ? verificationMethods[selectedLanguage as keyof typeof verificationMethods]?.find((m) => m.id === selectedMethod)
-          ?.warning
+      ? verificationMethods[
+          selectedLanguage as keyof typeof verificationMethods
+        ]?.find((m) => m.id === selectedMethod)?.warning
       : null;
 
   // Get the framework message for the selected framework (or the active framework in build-info mode)
-  const selectedFrameworkMessage = (isFrameworkMethod && frameworkMessages[selectedMethod]) || 
-                                   (isBuildInfoMode && frameworkMessages[lastFrameworkMethod]);
-  
+  const selectedFrameworkMessage =
+    (isFrameworkMethod && frameworkMessages[selectedMethod]) ||
+    (isBuildInfoMode && frameworkMessages[lastFrameworkMethod]);
+
   // Get the currently active framework method for visual selection purposes
-  const activeFrameworkMethod = isBuildInfoMode ? lastFrameworkMethod : (isFrameworkMethod ? selectedMethod : null);
+  const activeFrameworkMethod = isBuildInfoMode
+    ? lastFrameworkMethod
+    : isFrameworkMethod
+    ? selectedMethod
+    : null;
 
   return (
     <div>
-      <label className="block text-base font-semibold text-gray-900 mb-2">Verification Method</label>
+      <label className="block text-base font-semibold text-gray-900 mb-2">
+        Verification Method
+      </label>
       <div className="flex flex-wrap gap-4">
         {methods?.map((method) => (
           <button
@@ -72,7 +89,7 @@ export default function VerificationMethodSelector({
             )}
             {method.id === "metadata-json" && (
               <>
-                <button
+                {/* <button
                   type="button"
                   data-tooltip-id="metadata-json-tooltip"
                   data-tooltip-content="Click to learn more"
@@ -83,13 +100,25 @@ export default function VerificationMethodSelector({
                   className="absolute -top-2 -right-2 w-6 h-6 bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-800 rounded-full flex items-center justify-center text-xs font-medium transition-colors duration-200 shadow-sm"
                 >
                   ?
-                </button>
+                </button> */}
+                <a
+                  href="https://docs.soliditylang.org/en/latest/metadata.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-tooltip-id="metadata-json-tooltip"
+                  data-tooltip-content="Click to learn more"
+                  className="absolute -top-2 -right-2 w-6 h-6 bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-800 rounded-full flex items-center justify-center text-xs font-medium transition-colors duration-200 shadow-sm"
+                >
+                  ?
+                </a>
                 <ReactTooltip id="metadata-json-tooltip" place="top" />
               </>
             )}
             <h3
               className={`text-base font-medium mb-1 ${
-                selectedMethod === method.id ? "text-cerulean-blue-600" : "text-gray-700"
+                selectedMethod === method.id
+                  ? "text-cerulean-blue-600"
+                  : "text-gray-700"
               }`}
             >
               {method.title}
@@ -115,7 +144,9 @@ export default function VerificationMethodSelector({
             <img src={method.icon} alt={method.title} className="w-6 h-6" />
             <h3
               className={`text-base font-medium ${
-                activeFrameworkMethod === method.id ? "text-cerulean-blue-600" : "text-gray-700"
+                activeFrameworkMethod === method.id
+                  ? "text-cerulean-blue-600"
+                  : "text-gray-700"
               }`}
             >
               {method.title}
@@ -141,12 +172,16 @@ export default function VerificationMethodSelector({
               }}
               className="sr-only"
             />
-            <div className={`w-11 h-6 rounded-full relative transition-colors ${
-              isBuildInfoMode ? "bg-cerulean-blue-600" : "bg-gray-200"
-            }`}>
-              <div className={`absolute top-[2px] left-[2px] bg-white border border-gray-300 rounded-full h-5 w-5 transition-transform ${
-                isBuildInfoMode ? "translate-x-full" : ""
-              }`}></div>
+            <div
+              className={`w-11 h-6 rounded-full relative transition-colors ${
+                isBuildInfoMode ? "bg-cerulean-blue-600" : "bg-gray-200"
+              }`}
+            >
+              <div
+                className={`absolute top-[2px] left-[2px] bg-white border border-gray-300 rounded-full h-5 w-5 transition-transform ${
+                  isBuildInfoMode ? "translate-x-full" : ""
+                }`}
+              ></div>
             </div>
           </label>
           <span className="text-sm text-gray-700 flex items-center gap-1">
@@ -159,22 +194,29 @@ export default function VerificationMethodSelector({
             >
               <MdInfo size={16} />
             </button>
-            <ReactTooltip id="build-info-tooltip" place="top" style={{ maxWidth: '300px' }} />
+            <ReactTooltip
+              id="build-info-tooltip"
+              place="top"
+              style={{ maxWidth: "300px" }}
+            />
           </span>
         </div>
       )}
 
-
       {/* Verification Warnings */}
       {selectedMethodWarning && (
         <div className="mt-4">
-          <VerificationWarning type="warning">{selectedMethodWarning}</VerificationWarning>
+          <VerificationWarning type="warning">
+            {selectedMethodWarning}
+          </VerificationWarning>
         </div>
       )}
 
       {selectedFrameworkMessage && !isBuildInfoMode && (
         <div className="mt-4">
-          <VerificationWarning type="info">{selectedFrameworkMessage()}</VerificationWarning>
+          <VerificationWarning type="info">
+            {selectedFrameworkMessage()}
+          </VerificationWarning>
         </div>
       )}
     </div>

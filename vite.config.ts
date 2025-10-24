@@ -5,4 +5,11 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
+  server: {
+    allowedHosts: [
+      process.env.VITE_ENV === "production"
+        ? "verify.walnut.dev"
+        : "verify.walnut.local",
+    ],
+  },
 });

@@ -12,7 +12,11 @@ import ContractIdentifier from "./verification/ContractIdentifier";
 import OptionalFields from "./verification/OptionalFields";
 import { frameworkMethods } from "../data/verificationMethods";
 import type { VerificationMethod } from "../types/verification";
-import { assembleAndSubmitStandardJson, submitStdJsonFile, submitMetadataVerification } from "../utils/sourcifyApi";
+import {
+  assembleAndSubmitStandardJson,
+  submitStdJsonFile,
+  submitMetadataVerification,
+} from "../utils/sourcifyApi";
 import { buildMetadataSubmissionSources } from "../utils/metadataValidation";
 import { parseBuildInfoFile } from "../utils/buildInfoValidation";
 import { useCompilerVersions } from "../contexts/CompilerVersionsContext";
@@ -24,6 +28,7 @@ import ImportSources from "./verification/ImportSources";
 import SubmissionResultDisplay from "./verification/SubmissionResultDisplay";
 import { useServerConfig } from "../contexts/ServerConfigContext";
 import { IoSettings } from "react-icons/io5";
+import PrivateVerificationSwitch from "./PrivateVerificationSwitch";
 
 interface VerificationFormProps {
   preselectedChainId?: string;
@@ -31,7 +36,11 @@ interface VerificationFormProps {
   hideImport?: boolean;
 }
 
-export default function VerificationForm({ preselectedChainId, preselectedAddress, hideImport }: VerificationFormProps) {
+export default function VerificationForm({
+  preselectedChainId,
+  preselectedAddress,
+  hideImport,
+}: VerificationFormProps) {
   const { serverUrl } = useServerConfig();
   const { chains } = useChains();
   const { solidityVersions, vyperVersions } = useCompilerVersions();
@@ -39,8 +48,12 @@ export default function VerificationForm({ preselectedChainId, preselectedAddres
   const [importSuccess, setImportSuccess] = React.useState<string | null>(null);
   const [showSettingsModal, setShowSettingsModal] = React.useState(false);
   const [isAddressValid, setIsAddressValid] = React.useState(false);
-  const [lastSubmittedValues, setLastSubmittedValues] = React.useState<string | null>(null);
-  const [buildInfoError, setBuildInfoError] = React.useState<string | null>(null);
+  const [lastSubmittedValues, setLastSubmittedValues] = React.useState<
+    string | null
+  >(null);
+  const [buildInfoError, setBuildInfoError] = React.useState<string | null>(
+    null
+  );
 
   // Clear success message after 3 seconds
   React.useEffect(() => {
@@ -68,11 +81,12 @@ export default function VerificationForm({ preselectedChainId, preselectedAddres
     try {
       const file = files[0];
       const content = await file.text();
-      const availableVersions = selectedLanguage === 'vyper' ? vyperVersions : solidityVersions;
+      const availableVersions =
+        selectedLanguage === "vyper" ? vyperVersions : solidityVersions;
       const parseResult = parseBuildInfoFile(content, availableVersions);
 
       if (!parseResult.isValid) {
-        setBuildInfoError(parseResult.error || 'Invalid build-info file');
+        setBuildInfoError(parseResult.error || "Invalid build-info file");
         handleFilesChange([]);
         return;
       }
@@ -84,19 +98,26 @@ export default function VerificationForm({ preselectedChainId, preselectedAddres
 
       // Create a std-json file from the parsed build-info and store in regular uploadedFiles
       if (parseResult.standardJson) {
-        const standardJsonContent = JSON.stringify(parseResult.standardJson, null, 2);
-        const stdJsonFile = new File([standardJsonContent], 'build-info.json', { type: 'application/json' });
+        const standardJsonContent = JSON.stringify(
+          parseResult.standardJson,
+          null,
+          2
+        );
+        const stdJsonFile = new File([standardJsonContent], "build-info.json", {
+          type: "application/json",
+        });
         handleFilesChange([stdJsonFile]);
       }
-
     } catch (error) {
-      setBuildInfoError('Error processing build-info file');
+      setBuildInfoError("Error processing build-info file");
       handleFilesChange([]);
-      console.error('Build-info processing error:', error);
+      console.error("Build-info processing error:", error);
     }
   };
 
   const {
+    hasTenant,
+    privateVerification,
     selectedChainId,
     contractAddress,
     selectedLanguage,
@@ -109,6 +130,7 @@ export default function VerificationForm({ preselectedChainId, preselectedAddres
     optimizerRuns,
     contractIdentifier,
     creationTransactionHash,
+    handlePrivateVerificationChange,
     handleChainIdChange,
     handleContractAddressChange,
     handleLanguageSelect,
@@ -128,7 +150,9 @@ export default function VerificationForm({ preselectedChainId, preselectedAddres
   } = useVerificationState();
 
   // Check if selected method is a framework method
-  const isFrameworkMethod = frameworkMethods.some(method => method.id === selectedMethod);
+  const isFrameworkMethod = frameworkMethods.some(
+    (method) => method.id === selectedMethod
+  );
 
   const { isFormValid, errors, getSubmissionErrors } = useFormValidation({
     isAddressValid,
@@ -154,7 +178,9 @@ export default function VerificationForm({ preselectedChainId, preselectedAddres
       contractIdentifier,
       evmVersion,
       uploadedFileNames: uploadedFiles.map((f) => f.name + f.size).join(","),
-      metadataFileName: metadataFile ? metadataFile.name + metadataFile.size : "",
+      metadataFileName: metadataFile
+        ? metadataFile.name + metadataFile.size
+        : "",
     };
     return JSON.stringify(formValues);
   }, [
@@ -182,7 +208,13 @@ export default function VerificationForm({ preselectedChainId, preselectedAddres
         setImportSuccess(null);
       }
     }
-  }, [currentFormHash, lastSubmittedValues, submissionResult?.success, importSuccess, setSubmissionResult]);
+  }, [
+    currentFormHash,
+    lastSubmittedValues,
+    submissionResult?.success,
+    importSuccess,
+    setSubmissionResult,
+  ]);
 
   // Check if current form values are the same as last submitted values
   const hasFormChanged = lastSubmittedValues !== currentFormHash;
@@ -196,7 +228,9 @@ export default function VerificationForm({ preselectedChainId, preselectedAddres
         const submissionErrors = getSubmissionErrors();
         console.log("Form submission blocked. Missing:", submissionErrors);
       } else if (!hasFormChanged) {
-        console.log("Form submission blocked. No changes since last submission.");
+        console.log(
+          "Form submission blocked. No changes since last submission."
+        );
       }
       return;
     }
@@ -213,7 +247,10 @@ export default function VerificationForm({ preselectedChainId, preselectedAddres
           throw new Error("No metadata.json file uploaded");
         }
 
-        const { sources, metadata } = await buildMetadataSubmissionSources(metadataFile, uploadedFiles);
+        const { sources, metadata } = await buildMetadataSubmissionSources(
+          metadataFile,
+          uploadedFiles
+        );
 
         result = await submitMetadataVerification(
           serverUrl,
@@ -223,10 +260,14 @@ export default function VerificationForm({ preselectedChainId, preselectedAddres
           metadata,
           creationTransactionHash || undefined
         );
-      } else if (selectedMethod === "std-json" || selectedMethod === "build-info") {
+      } else if (
+        selectedMethod === "std-json" ||
+        selectedMethod === "build-info"
+      ) {
         // For std-json method or build-info method, use the uploaded file directly
         if (uploadedFiles.length === 0) {
-          const fileType = selectedMethod === "build-info" ? "build-info" : "standard JSON";
+          const fileType =
+            selectedMethod === "build-info" ? "build-info" : "standard JSON";
           throw new Error(`No ${fileType} file uploaded`);
         }
 
@@ -237,7 +278,8 @@ export default function VerificationForm({ preselectedChainId, preselectedAddres
           uploadedFiles[0],
           selectedCompilerVersion,
           contractIdentifier,
-          creationTransactionHash || undefined
+          creationTransactionHash || undefined,
+          privateVerification
         );
       } else {
         // For single-file and multiple-files methods, assemble standard JSON
@@ -284,7 +326,8 @@ export default function VerificationForm({ preselectedChainId, preselectedAddres
     } catch (error) {
       setSubmissionResult({
         success: false,
-        error: error instanceof Error ? error.message : "Unknown error occurred",
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
       });
     } finally {
       setIsSubmitting(false);
@@ -307,19 +350,27 @@ export default function VerificationForm({ preselectedChainId, preselectedAddres
   return (
     <>
       <div className="px-4 md:px-8 py-2 md:py-4">
+        {/* <div className="flex justify-end"> */}
         {/* Settings Button */}
-        <div className="flex justify-end">
-          <button
+        {/* <button
             type="button"
             onClick={() => setShowSettingsModal(true)}
             className="flex items-center space-x-1 md:space-x-2 py-1 md:py-2 px-3 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
           >
             <IoSettings className="w-4 h-4" />
             <span>Settings</span>
-          </button>
-        </div>
+          </button> */}
+        {/* </div> */}
 
         <form className="space-y-6 md:space-y-8 mb-6" onSubmit={handleSubmit}>
+          {hasTenant && (
+            <div className="flex">
+              <PrivateVerificationSwitch
+                privateVerification={privateVerification}
+                onPrivateVerificationChange={handlePrivateVerificationChange}
+              />
+            </div>
+          )}
           <ChainAndAddress
             selectedChainId={selectedChainId}
             contractAddress={contractAddress}
@@ -342,11 +393,15 @@ export default function VerificationForm({ preselectedChainId, preselectedAddres
               importSuccess={importSuccess}
               onImportError={handleImportError}
               onImportSuccess={setImportSuccess}
-            />)}
+            />
+          )}
 
-          <LicenseInfo />
+          {/*<LicenseInfo />*/}
 
-          <LanguageSelector selectedLanguage={selectedLanguage} onLanguageSelect={handleLanguageSelect} />
+          <LanguageSelector
+            selectedLanguage={selectedLanguage}
+            onLanguageSelect={handleLanguageSelect}
+          />
 
           {selectedLanguage && (
             <VerificationMethodSelector
@@ -371,11 +426,15 @@ export default function VerificationForm({ preselectedChainId, preselectedAddres
                   selectedMethod === "metadata-json"
                     ? handleMetadataFileChange
                     : selectedMethod === "build-info"
-                      ? handleBuildInfoFileChange
-                      : handleFilesChange
+                    ? handleBuildInfoFileChange
+                    : handleFilesChange
                 }
                 uploadedFiles={
-                  selectedMethod === "metadata-json" ? (metadataFile ? [metadataFile] : []) : uploadedFiles
+                  selectedMethod === "metadata-json"
+                    ? metadataFile
+                      ? [metadataFile]
+                      : []
+                    : uploadedFiles
                 }
               />
 
@@ -385,7 +444,7 @@ export default function VerificationForm({ preselectedChainId, preselectedAddres
                   <MetadataValidation
                     metadataFile={metadataFile}
                     uploadedFiles={uploadedFiles}
-                    onValidationChange={() => { }}
+                    onValidationChange={() => {}}
                   />
 
                   {/* Render an additional file upload for the sources when the method is metadata-json. We can treat the sources' file upload as a multiple-files case. */}
@@ -429,7 +488,9 @@ export default function VerificationForm({ preselectedChainId, preselectedAddres
           {!isFrameworkMethod && !!selectedMethod && (
             <OptionalFields
               creationTransactionHash={creationTransactionHash}
-              onCreationTransactionHashChange={handleCreationTransactionHashChange}
+              onCreationTransactionHashChange={
+                handleCreationTransactionHashChange
+              }
             />
           )}
 
@@ -448,32 +509,41 @@ export default function VerificationForm({ preselectedChainId, preselectedAddres
                 <button
                   type="submit"
                   disabled={!canSubmit}
-                  className={`w-full md:w-auto px-8 md:px-12 py-3 text-base md:text-lg rounded-md focus:outline-none focus:ring-2 focus:ring-cerulean-blue-500 focus:ring-offset-2 transition-colors flex items-center justify-center space-x-2 min-h-[44px] ${canSubmit
-                    ? "bg-cerulean-blue-500 text-white hover:bg-cerulean-blue-600"
-                    : "bg-gray-300 text-gray-500 !cursor-not-allowed"
-                    }`}
+                  className={`w-full md:w-auto px-8 md:px-12 py-3 text-base md:text-lg rounded-md focus:outline-none focus:ring-2 focus:ring-cerulean-blue-500 focus:ring-offset-2 transition-colors flex items-center justify-center space-x-2 min-h-[44px] ${
+                    canSubmit
+                      ? "bg-cerulean-blue-500 text-white hover:bg-cerulean-blue-600"
+                      : "bg-gray-300 text-gray-500 !cursor-not-allowed"
+                  }`}
                   title={getSubmitButtonTooltip()}
                 >
                   {isSubmitting && (
                     <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
                   )}
-                  <span>{isSubmitting ? "Submitting..." : "Verify Contract"}</span>
+                  <span>
+                    {isSubmitting ? "Submitting..." : "Verify Contract"}
+                  </span>
                 </button>
               </div>
 
               {/* Validation Errors List */}
               {!isFormValid && Object.keys(errors).length > 0 && (
                 <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-md">
-                  <h3 className="text-sm font-medium text-red-800 mb-2">Please complete the following fields:</h3>
+                  <h3 className="text-sm font-medium text-red-800 mb-2">
+                    Please complete the following fields:
+                  </h3>
                   <ul className="text-sm text-red-700 space-y-1">
                     {errors.chain && <li>• {errors.chain}</li>}
                     {errors.address && <li>• {errors.address}</li>}
                     {errors.language && <li>• {errors.language}</li>}
                     {errors.method && <li>• {errors.method}</li>}
                     {errors.files && <li>• {errors.files}</li>}
-                    {errors.compilerVersion && <li>• {errors.compilerVersion}</li>}
+                    {errors.compilerVersion && (
+                      <li>• {errors.compilerVersion}</li>
+                    )}
                     {errors.evmVersion && <li>• {errors.evmVersion}</li>}
-                    {errors.contractIdentifier && <li>• {errors.contractIdentifier}</li>}
+                    {errors.contractIdentifier && (
+                      <li>• {errors.contractIdentifier}</li>
+                    )}
                   </ul>
                 </div>
               )}
@@ -483,7 +553,11 @@ export default function VerificationForm({ preselectedChainId, preselectedAddres
       </div>
 
       {/* Settings Modal */}
-      <Settings isOpen={showSettingsModal} onClose={() => setShowSettingsModal(false)} hideImportSettings={hideImport} />
+      <Settings
+        isOpen={showSettingsModal}
+        onClose={() => setShowSettingsModal(false)}
+        hideImportSettings={hideImport}
+      />
     </>
   );
 }
