@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
 import { useChains } from "../contexts/ChainsContext";
 import { Tooltip } from "react-tooltip";
+import { useUserSession } from "~/contexts/UserSessionContext";
 import { useServerConfig } from "~/contexts/ServerConfigContext";
 import { removeCurrentServerUrl } from "../utils/serverStorage";
 import { Link } from "react-router";
-import { FaGithub } from "react-icons/fa";
 
 interface PageLayoutProps {
   children: ReactNode;
@@ -13,9 +13,16 @@ interface PageLayoutProps {
   subtitle?: string;
 }
 
-export default function PageLayout({ children, maxWidth = "max-w-4xl", title, subtitle }: PageLayoutProps) {
+export default function PageLayout({
+  children,
+  maxWidth = "max-w-4xl",
+  title,
+  subtitle,
+}: PageLayoutProps) {
+  const { user } = useUserSession();
   const { loading, error, refetch } = useChains();
-  const { serverUrl, setServerUrl, getDefaultServerUrls, setCustomServerUrls } = useServerConfig();
+  const { serverUrl, setServerUrl, getDefaultServerUrls, setCustomServerUrls } =
+    useServerConfig();
 
   const handleResetServerSettings = () => {
     // Clear custom server URLs
@@ -44,7 +51,9 @@ export default function PageLayout({ children, maxWidth = "max-w-4xl", title, su
 
     return (
       <div className="text-center p-4 md:p-8 border-b border-gray-200">
-        <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 tracking-tight">{title}</h1>
+        <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 tracking-tight">
+          {title}
+        </h1>
         <p className="max-w-2xl mx-auto text-sm md:text-base text-gray-600">
           {envPrefix}
           {subtitle}
@@ -67,7 +76,12 @@ export default function PageLayout({ children, maxWidth = "max-w-4xl", title, su
       return (
         <div className="text-center p-4 md:p-8">
           <div className="text-light-coral-500 mb-4">
-            <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg
+              className="mx-auto h-12 w-12"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -106,22 +120,32 @@ export default function PageLayout({ children, maxWidth = "max-w-4xl", title, su
         <div className="mx-auto py-3 md:py-4 flex items-center justify-between w-full max-w-[100rem] px-4 md:px-12 lg:px-12 xl:px-24">
           <Link to="/" className="flex items-center">
             <img
-              src="/sourcify.png"
-              alt="Sourcify Logo"
-              className="h-8 md:h-10 w-auto mr-2 md:mr-3"
+              src="/walnut.png"
+              alt="Walnut Logo"
+              className="h-8 md:h-10 w-auto mr-2 md:mr-3 rounded-full"
               width={32}
               height={32}
             />
-            <span className="text-gray-700 font-vt323 text-xl md:text-2xl">verify.sourcify.eth</span>
+            <span className="text-gray-700 font-vt323 text-xl md:text-2xl">
+              verify.walnut.
+              {import.meta.env.VITE_ENV === "production" ? "dev" : "local"}
+            </span>
           </Link>
           <a
-            href="https://github.com/sourcifyeth/verify.sourcify.dev"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-gray-600 hover:text-gray-900 transition-colors p-2"
-            aria-label="View source code on GitHub"
+            href={
+              import.meta.env.VITE_ENV === "production"
+                ? "https://evm.walnut.dev"
+                : "http://evm.walnut.local"
+            }
+            aria-label="Back to Walnut"
           >
-            <FaGithub className="w-6 h-6" />
+            <img
+              src={user ? user.image : "/walnut.png"}
+              alt={user ? `User avatar for ${user.name}` : "Walnut Logo"}
+              className="size-8 rounded-full"
+              width={32}
+              height={32}
+            />
           </a>
         </div>
       </header>
