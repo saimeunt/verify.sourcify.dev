@@ -8,7 +8,8 @@ import type {
 
 export const flatteningWarning = (
   <span>
-    Flattenning or modifying sources will change the metadata hash and will break{" "}
+    Flattenning or modifying sources will change the metadata hash and will
+    break{" "}
     <a
       href="https://docs.sourcify.dev/docs/exact-match-vs-match/"
       className="text-cerulean-blue-600 hover:text-cerulean-blue-700 underline"
@@ -17,8 +18,8 @@ export const flatteningWarning = (
     >
       Exact Matches
     </a>
-    . Always prefer standard JSON, metadata.json, or using the built-in verification commands in frameworks like Hardhat
-    or Foundry.
+    . Always prefer standard JSON, metadata.json, or using the built-in
+    verification commands in frameworks like Hardhat or Foundry.
   </span>
 );
 
@@ -56,12 +57,12 @@ export const verificationMethods: VerificationMethods = {
 };
 
 export const frameworkMethods: FrameworkMethodObject[] = [
-  {
-    id: "hardhat",
-    title: "Hardhat",
-    description: "Use Hardhat's built-in verification",
-    icon: "/hardhat.png",
-  },
+  // {
+  //   id: "hardhat",
+  //   title: "Hardhat",
+  //   description: "Use Hardhat's built-in verification",
+  //   icon: "/hardhat.png",
+  // },
   {
     id: "foundry",
     title: "Foundry",
@@ -70,72 +71,74 @@ export const frameworkMethods: FrameworkMethodObject[] = [
   },
 ];
 
-export const createFrameworkMessage = (framework: 'hardhat' | 'foundry') => () => {
-  const isHardhat = framework === 'hardhat';
-  
-  return (
-    <div>
-      <p className="mb-3 text-sm">
-        <a
-          href={isHardhat 
-            ? "https://hardhat.org/hardhat-runner/plugins/nomicfoundation-hardhat-verify#verifying-on-sourcify"
-            : "https://book.getfoundry.sh/reference/forge/forge-verify-contract"
-          }
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-cerulean-blue-600 hover:text-cerulean-blue-700 underline"
-        >
-          {isHardhat ? 'Hardhat' : 'Foundry'} Documentation →
-        </a>
-      </p>
-      
-      {isHardhat ? (
-        <>
-          <p className="mb-3">Enable Sourcify in your hardhat.config.js:</p>
-          <div className="bg-gray-900 text-gray-100 p-4 rounded-lg mb-3 overflow-x-auto">
-            <pre className="text-sm">
-              {`module.exports = {
+export const createFrameworkMessage =
+  (framework: "hardhat" | "foundry") => () => {
+    const isHardhat = framework === "hardhat";
+
+    return (
+      <div>
+        <p className="mb-3 text-sm">
+          <a
+            href={
+              isHardhat
+                ? "https://hardhat.org/hardhat-runner/plugins/nomicfoundation-hardhat-verify#verifying-on-sourcify"
+                : "https://book.getfoundry.sh/reference/forge/forge-verify-contract"
+            }
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-cerulean-blue-600 hover:text-cerulean-blue-700 underline"
+          >
+            {isHardhat ? "Hardhat" : "Foundry"} Documentation →
+          </a>
+        </p>
+
+        {isHardhat ? (
+          <>
+            <p className="mb-3">Enable Sourcify in your hardhat.config.js:</p>
+            <div className="bg-gray-900 text-gray-100 p-4 rounded-lg mb-3 overflow-x-auto">
+              <pre className="text-sm">
+                {`module.exports = {
   sourcify: {
     // Doesn't need an API key
     enabled: true
   }
 };`}
-            </pre>
-          </div>
-          <p className="mb-2">Then verify a contract:</p>
-          <div className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto">
-            <pre className="text-sm">
-              {`npx hardhat verify --network mainnet 0x1F98431c8aD98523631AE4a59f267346ea31F984`}
-            </pre>
-          </div>
-        </>
-      ) : (
-        <>
-          <p className="mb-2">Deploy and verify with Foundry:</p>
-          <div className="bg-gray-900 text-gray-100 p-4 rounded-lg mb-3 overflow-x-auto">
-            <pre className="text-sm">
-              {`forge create --rpc-url <rpc-url> --private-key <private-key> src/MyContract.sol:MyContract --verify --verifier sourcify`}
-            </pre>
-          </div>
-          <p className="mb-2">Or verify an already deployed contract:</p>
-          <div className="bg-gray-900 text-gray-100 p-4 rounded-lg mb-3 overflow-x-auto">
-            <pre className="text-sm">
-              {`forge verify-contract --verifier sourcify --chain <chain-id> 0xB4239c86440d6C39d518D6457038cB404451529b MyContract`}
-            </pre>
-          </div>
-          <p className="mb-2">Check if a contract is verified:</p>
-          <div className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto">
-            <pre className="text-sm">
-              {`forge verify-check 0x1F98431c8aD98523631AE4a59f267346ea31F984 --verifier sourcify`}
-            </pre>
-          </div>
-        </>
-      )}
-    </div>
-  );
-};
+              </pre>
+            </div>
+            <p className="mb-2">Then verify a contract:</p>
+            <div className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto">
+              <pre className="text-sm">
+                {`npx hardhat verify --network mainnet 0x1F98431c8aD98523631AE4a59f267346ea31F984`}
+              </pre>
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="mb-2">Deploy and verify with Foundry:</p>
+            <div className="bg-gray-900 text-gray-100 p-4 rounded-lg mb-3 overflow-x-auto">
+              <pre className="text-sm">
+                {`forge create --rpc-url <rpc-url> --private-key <private-key> src/MyContract.sol:MyContract --verify --verifier sourcify`}
+              </pre>
+            </div>
+            <p className="mb-2">Or verify an already deployed contract:</p>
+            <div className="bg-gray-900 text-gray-100 p-4 rounded-lg mb-3 overflow-x-auto">
+              <pre className="text-sm">
+                {`forge verify-contract --verifier sourcify --chain <chain-id> 0xB4239c86440d6C39d518D6457038cB404451529b MyContract`}
+              </pre>
+            </div>
+            <p className="mb-2">Check if a contract is verified:</p>
+            <div className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto">
+              <pre className="text-sm">
+                {`forge verify-check 0x1F98431c8aD98523631AE4a59f267346ea31F984 --verifier sourcify`}
+              </pre>
+            </div>
+          </>
+        )}
+      </div>
+    );
+  };
 
 export const frameworkMessages: FrameworkMessages = {
-  hardhat: createFrameworkMessage('hardhat'),
-  foundry: createFrameworkMessage('foundry'),
+  hardhat: createFrameworkMessage("hardhat"),
+  foundry: createFrameworkMessage("foundry"),
 };

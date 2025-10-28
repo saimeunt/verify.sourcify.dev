@@ -23,7 +23,7 @@ export default function VerificationMethodSelector({
   // Keep track of the last selected framework method so we can return to it
   const [lastFrameworkMethod, setLastFrameworkMethod] = useState<
     "hardhat" | "foundry"
-  >("hardhat");
+  >("foundry");
 
   if (!selectedLanguage) return null;
 
@@ -132,14 +132,16 @@ export default function VerificationMethodSelector({
       <div className="flex gap-4 mt-4">
         {frameworkMethods.map((method) => (
           <button
+            disabled
             key={method.id}
             type="button"
-            onClick={() => onMethodSelect(method.id)}
-            className={`relative flex items-center justify-center gap-2 p-3 border-2 rounded-lg text-center transition-all duration-200 w-36 ${
-              activeFrameworkMethod === method.id
-                ? "border-cerulean-blue-500 bg-cerulean-blue-50"
-                : "border-gray-300 hover:border-cerulean-blue-300 hover:bg-gray-50"
-            }`}
+            // onClick={() => onMethodSelect(method.id)}
+            // className={`relative flex items-center justify-center gap-2 p-3 border-2 rounded-lg text-center transition-all duration-200 w-36 ${
+            //   activeFrameworkMethod === method.id
+            //     ? "border-cerulean-blue-500 bg-cerulean-blue-50"
+            //     : "border-gray-300 hover:border-cerulean-blue-300 hover:bg-gray-50"
+            // }`}
+            className="relative flex items-center justify-center gap-2 p-3 border-2 rounded-lg text-center transition-all duration-200 w-36 border-gray-300 bg-gray-300 text-gray-500 cursor-not-allowed!"
           >
             <img src={method.icon} alt={method.title} className="w-6 h-6" />
             <h3
@@ -151,6 +153,17 @@ export default function VerificationMethodSelector({
             >
               {method.title}
             </h3>
+            <a
+              href="https://t.me/walnuthq"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-tooltip-id={`${method.id}-tooltip`}
+              data-tooltip-content={`Contact us to enable ${method.title} verification`}
+              className="absolute -top-2 -right-2 w-6 h-6 bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-800 rounded-full flex items-center justify-center text-xs font-medium transition-colors duration-200 shadow-sm"
+            >
+              ?
+            </a>
+            <ReactTooltip id={`${method.id}-tooltip`} place="top" />
           </button>
         ))}
       </div>

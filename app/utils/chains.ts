@@ -3,11 +3,15 @@ import type { Chain } from "../types/chains";
 /**
  * Custom fetch function for Sourcify API calls that adds client identification headers
  */
-function sourcifyFetch(url: string, options: RequestInit = {}): Promise<Response> {
+function sourcifyFetch(
+  url: string,
+  options: RequestInit = {}
+): Promise<Response> {
   const gitCommit = import.meta.env.VITE_GIT_COMMIT || "dev";
-  
+
   return fetch(url, {
     ...options,
+    credentials: "include",
     headers: {
       ...options.headers,
       "X-Client-Source": "sourcify-ui",
@@ -22,7 +26,9 @@ export async function fetchChains(serverUrl: string): Promise<Chain[]> {
     const response = await sourcifyFetch(`${serverUrl}/chains`);
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch chains: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Failed to fetch chains: ${response.status} ${response.statusText}`
+      );
     }
 
     const chains: Chain[] = await response.json();
@@ -35,7 +41,10 @@ export async function fetchChains(serverUrl: string): Promise<Chain[]> {
   }
 }
 
-export function getChainById(chains: Chain[], chainId: number): Chain | undefined {
+export function getChainById(
+  chains: Chain[],
+  chainId: number
+): Chain | undefined {
   return chains.find((chain) => chain.chainId === chainId);
 }
 

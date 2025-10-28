@@ -3,7 +3,6 @@ import type { ReactNode } from "react";
 import type { Chain } from "../types/chains";
 import { fetchChains } from "../utils/chains";
 import { useServerConfig } from "./ServerConfigContext";
-import { useUserSession } from "~/contexts/UserSessionContext";
 
 // Cache configuration
 const CACHE_KEY = "sourcify_chains_cache";
@@ -25,7 +24,6 @@ interface ChainsContextType {
 const ChainsContext = createContext<ChainsContextType | undefined>(undefined);
 
 export function ChainsProvider({ children }: { children: ReactNode }) {
-  const { session } = useUserSession();
   const { serverUrl } = useServerConfig();
   const [chains, setChains] = useState<Chain[]>([]);
   const [loading, setLoading] = useState(true);
@@ -87,16 +85,6 @@ export function ChainsProvider({ children }: { children: ReactNode }) {
 
       // Fetch from API if no valid cache
       const fetchedChains = await fetchChains(serverUrl);
-      const tenantNetworks = session?.tenantNetworks ?? [];
-      fetchedChains.push(
-        ...tenantNetworks.map((tenantNetwork) => ({
-          name: tenantNetwork.displayName,
-          chainId: tenantNetwork.chainId,
-          rpc: [tenantNetwork.rpcUrl],
-          supported: true,
-          etherscanAPI: false,
-        }))
-      );
       setChains(fetchedChains);
       setCachedChains(fetchedChains);
     } catch (err) {
@@ -114,7 +102,7 @@ export function ChainsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Load chains immediately (will use cache if available)
     loadChains(false);
-  }, [session, serverUrl]);
+  }, [serverUrl]);
 
   return (
     <ChainsContext.Provider value={{ chains, loading, error, refetch }}>
