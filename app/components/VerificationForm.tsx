@@ -5,7 +5,7 @@ import LanguageSelector from "./verification/LanguageSelector";
 import VerificationMethodSelector from "./verification/VerificationMethodSelector";
 import ChainAndAddress from "./verification/ChainAndAddress";
 import CompilerSelector from "./verification/CompilerSelector";
-import LicenseInfo from "./verification/LicenseInfo";
+// import LicenseInfo from "./verification/LicenseInfo";
 import FileUpload from "./verification/FileUpload";
 import CompilerSettings from "./verification/CompilerSettings";
 import ContractIdentifier from "./verification/ContractIdentifier";
@@ -27,7 +27,7 @@ import Settings from "./verification/Settings";
 import ImportSources from "./verification/ImportSources";
 import SubmissionResultDisplay from "./verification/SubmissionResultDisplay";
 import { useServerConfig } from "../contexts/ServerConfigContext";
-import { IoSettings } from "react-icons/io5";
+// import { IoSettings } from "react-icons/io5";
 import PrivateVerificationSwitch from "./PrivateVerificationSwitch";
 
 interface VerificationFormProps {
@@ -116,7 +116,6 @@ export default function VerificationForm({
   };
 
   const {
-    hasTenant,
     privateVerification,
     selectedChainId,
     contractAddress,
@@ -363,14 +362,12 @@ export default function VerificationForm({
         {/* </div> */}
 
         <form className="space-y-6 md:space-y-8 mb-6" onSubmit={handleSubmit}>
-          {hasTenant && (
-            <div className="flex">
-              <PrivateVerificationSwitch
-                privateVerification={privateVerification}
-                onPrivateVerificationChange={handlePrivateVerificationChange}
-              />
-            </div>
-          )}
+          <div className="flex">
+            <PrivateVerificationSwitch
+              privateVerification={privateVerification}
+              onPrivateVerificationChange={handlePrivateVerificationChange}
+            />
+          </div>
           <ChainAndAddress
             selectedChainId={selectedChainId}
             contractAddress={contractAddress}
