@@ -103,7 +103,6 @@ export function useVerificationState() {
   };
 
   return {
-    hasTenant,
     privateVerification,
     selectedChainId,
     contractAddress,

@@ -11,6 +11,7 @@ export default function PrivateVerificationSwitch({
   if (!session) {
     return null;
   }
+  const hasTenant = session.tenantNetworks.length > 0;
   const { tenantName } = session.tenantNetworks[0] ?? { tenantName: "" };
   return (
     <div className="flex flex-col gap-2">
@@ -21,13 +22,16 @@ export default function PrivateVerificationSwitch({
             id="private-verification"
             name="private-verification"
             type="checkbox"
+            disabled={!hasTenant}
             checked={privateVerification}
             onChange={(event) =>
               onPrivateVerificationChange(event.target.checked)
             }
             aria-labelledby="private-verification-label"
             aria-describedby="private-verification-description"
-            className="absolute inset-0 appearance-none focus:outline-hidden"
+            className={`absolute inset-0 appearance-none focus:outline-hidden ${
+              !hasTenant && "!cursor-not-allowed"
+            }`}
           />
         </div>
         <div className="text-sm">
@@ -45,6 +49,23 @@ export default function PrivateVerificationSwitch({
               className="text-gray-500"
             >
               (verifying on {tenantName})
+            </span>
+          )}
+          {!hasTenant && (
+            <span
+              id="private-verification-description"
+              className="text-gray-500"
+            >
+              Looking for private verification?{" "}
+              <a
+                href="https://t.me/walnuthq"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-cerulean-blue-600 hover:text-cerulean-blue-800 underline"
+              >
+                Contact us
+              </a>
+              .
             </span>
           )}
         </div>
